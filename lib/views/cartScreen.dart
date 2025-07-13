@@ -1,13 +1,25 @@
+import 'package:app_ropa/goRouter/router.dart';
 import 'package:app_ropa/models/pedidoModel.dart';
 import 'package:app_ropa/models/ropaModel.dart';
+import 'package:app_ropa/models/userModel.dart';
 import 'package:app_ropa/providers/productoProvider.dart';
 import 'package:app_ropa/repositories/pedidoRepositorie.dart';
+import 'package:app_ropa/service/ropaService.dart';
 import 'package:app_ropa/views/factura.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class Cartscreen extends StatelessWidget {
-  const Cartscreen({super.key});
+  final Usuario usuario;
+
+  const Cartscreen({super.key, required this.usuario});
+
+  String _generarIdPedido() {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final codigo = timestamp.toRadixString(16).substring(0, 8).toUpperCase();
+    return 'PED-$codigo';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +32,20 @@ class Cartscreen extends StatelessWidget {
 
     const double envio = 10.0;
     final double total = subtotal + envio;
+    final ropaService = RopaServiceFirebase();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Carrito de compras')),
+      appBar: AppBar(
+        title: const Text('Carrito de compras'),
+        actions: [
+          IconButton(
+            onPressed: () {
+    context.go(Routes.home, extra: usuario);
+            },
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ],
+      ),
       body:
           carrito.productos.isEmpty
               ? const Center(child: Text('Tu carrito está vacío'))
@@ -40,8 +63,8 @@ class Cartscreen extends StatelessWidget {
 
                           return Column(
                             children: [
-                              Container(
-                                height: 120,
+                              SizedBox(
+                                height: 180,
                                 child: Row(
                                   children: [
                                     Image.network(
@@ -133,18 +156,21 @@ class Cartscreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        final carrito = Provider.of<CarritoProvider>(
-                          context,
-                          listen: false,
-                        );
                         final repo = PedidoRepository();
-
+                        final ropaService = RopaServiceFirebase();
                         List<Pedido> listaPedidos = [];
 
                         try {
                           for (var item in carrito.productos) {
                             final producto = item['producto'];
+                            if (producto == null || producto is! Producto) {
+                              print('❌ Producto inválido: $item');
+                              continue;
+                            }
+
                             final pedido = Pedido(
+                              id: _generarIdPedido(),
+                              idProducto: producto.idProducto,
                               fecha: DateTime.now(),
                               nombre: producto.nombre,
                               precio: producto.precio,
@@ -154,26 +180,48 @@ class Cartscreen extends StatelessWidget {
                               total: producto.precio * item['cantidad'],
                             );
 
-                            await repo.agregarPedido(pedido);
+                            print("✅ Pedido creado: ${pedido.toMap()}");
+
+                            await repo.agregarPedido(pedido, usuario);
+                            await ropaService.reducirStockEnFirebase(
+                              producto.idProducto.toString(),
+                              item['cantidad'],
+                            );
+                            await repo.reducirStockEnOracle(
+                              producto.idProducto,
+                              item['cantidad'],
+                            );
+
                             listaPedidos.add(pedido);
                           }
-
-                          carrito.vaciarCarrito();
-
-                          // Redirigir a la pantalla de factura
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => FacturaScreen(pedidos: listaPedidos),
-                            ),
-                          );
-                        } catch (e) {
+                        } catch (e, stack) {
+                          print('❌ Error durante registro: $e');
+                          print(stack);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Error al registrar pedido: $e'),
                             ),
                           );
+                          return; // 🚫 Evita continuar si hubo error
                         }
+
+                        if (listaPedidos.isEmpty) {
+                          print(
+                            '⚠️ No se generaron pedidos. Navegación cancelada.',
+                          );
+                          return;
+                        }
+
+                        carrito.vaciarCarrito();
+
+                        print(
+                          "🟢 Navegando a factura con ${listaPedidos.length} pedidos",
+                        );
+
+                        context.push(
+                          Routes.facturaPage,
+                          extra: {'pedidos': listaPedidos, 'usuario': usuario},
+                        );
                       },
                       child: const Text(
                         "Pagar",

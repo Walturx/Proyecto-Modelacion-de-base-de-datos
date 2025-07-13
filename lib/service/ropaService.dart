@@ -22,4 +22,46 @@ class RopaServiceFirebase {
     }
   }
   
+  
+Future<void> reducirStockEnFirebase(String idProducto, int cantidadVendida) async {
+  final ropaRef = FirebaseFirestore.instance.collection('productos');
+
+  try {
+    // Asegúrate que idProducto es número
+    final idNum = int.tryParse(idProducto);
+    if (idNum == null) {
+      throw Exception('ID de producto inválido: $idProducto');
+    }
+
+    final query = await ropaRef.where('id', isEqualTo: idNum).get();
+
+    if (query.docs.isEmpty) {
+      print('❌ Producto con id $idNum no encontrado por campo "id"');
+      throw Exception('Producto no encontrado en Firebase');
+    }
+
+    final doc = query.docs.first;
+    final docRef = ropaRef.doc(doc.id);
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      final data = snapshot.data();
+
+      if (data == null) {
+        throw Exception('Documento vacío');
+      }
+
+      final stockActual = (data['stock'] ?? 0) as int;
+      final nuevoStock = stockActual - cantidadVendida;
+
+      transaction.update(docRef, {'stock': nuevoStock});
+    });
+
+    print('🟢 Stock reducido correctamente en Firebase para ID $idNum');
+  } catch (e) {
+    print('❌ Error durante la reducción de stock: $e');
+    rethrow;
+  }
 }
+}
+

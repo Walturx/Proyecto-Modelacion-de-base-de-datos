@@ -1,11 +1,14 @@
 import 'package:app_ropa/cubit/ropa_cubit.dart';
 import 'package:app_ropa/goRouter/router.dart';
 import 'package:app_ropa/models/ropaModel.dart';
+import 'package:app_ropa/models/userModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 class Homescreen extends StatefulWidget {
-  const Homescreen({super.key});
+  final Usuario usuario;
+
+  const Homescreen({super.key, required this.usuario});
 
   @override
   State<Homescreen> createState() => _HomescreenState();
@@ -92,7 +95,7 @@ class _HomescreenState extends State<Homescreen> {
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.8,
+                        childAspectRatio: 0.66,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
@@ -118,9 +121,15 @@ class _HomescreenState extends State<Homescreen> {
   Widget buildRopaCard(BuildContext context, Producto ropa) {
     return InkWell(
       onTap: () {
-         context.push(Routes.ropa, extra: ropa);
+         context.push(Routes.ropa, extra: {
+  'producto': ropa,
+  'usuario': widget.usuario,
+});
+
       },
       child: Container(
+        height: 400,
+        width: 100,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
@@ -138,9 +147,9 @@ class _HomescreenState extends State<Homescreen> {
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
                 ropa.imagen,
-                fit: BoxFit.cover,
+                fit: BoxFit.fitHeight,
                 width: double.infinity,
-                height: 150,
+                height: 110,
               ),
             ),
             SizedBox(height: 10),

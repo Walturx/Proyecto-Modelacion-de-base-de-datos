@@ -1,5 +1,6 @@
 import 'package:app_ropa/goRouter/router.dart';
 import 'package:app_ropa/models/ropaModel.dart';
+import 'package:app_ropa/models/userModel.dart';
 import 'package:app_ropa/providers/productoProvider.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,13 @@ import 'package:provider/provider.dart';
 
 class ProductScreen extends StatefulWidget {
   final Producto producto;
-  const ProductScreen({super.key, required this.producto});
+  final Usuario usuario;
+
+  const ProductScreen({
+    super.key,
+    required this.producto,
+    required this.usuario,
+  });
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -20,25 +27,25 @@ String? colorSeleccionado;
 class _ProductScreenState extends State<ProductScreen> {
   int counter = 1;
 
-  @override
-  Widget build(BuildContext context) {
-    final providerProducto = Provider.of<CarritoProvider>(context);
+ @override
+Widget build(BuildContext context) {
+  final providerProducto = Provider.of<CarritoProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalle del producto'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.shopping_cart),
-            onPressed: () {}, // Ir al carrito
-          ),
-        ],
-      ),
-      body: Padding(
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Detalle del producto'),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.shopping_cart),
+          onPressed: () {}, // Ir al carrito
+        ),
+      ],
+    ),
+    body: SafeArea(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Imagen principal con swiper (a futuro puedes agregar más imágenes)
             Container(
               height: 400,
               child: Swiper(
@@ -55,14 +62,13 @@ class _ProductScreenState extends State<ProductScreen> {
 
             const SizedBox(height: 20),
 
-            // Nombre y precio
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   widget.producto.nombre,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -75,7 +81,6 @@ class _ProductScreenState extends State<ProductScreen> {
 
             const SizedBox(height: 10),
 
-            // Selección de cantidad
             Row(
               children: [
                 Container(
@@ -133,7 +138,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       listen: false,
                     ).agregarProducto(
                       widget.producto,
-                      counter, // ✅ cantidad real seleccionada
+                      counter,
                       tallaSeleccionada!,
                       colorSeleccionado!,
                     );
@@ -144,7 +149,10 @@ class _ProductScreenState extends State<ProductScreen> {
                       ),
                     );
 
-                    GoRouter.of(context).go(Routes.cartPage);
+                    GoRouter.of(context).go(
+                      Routes.cartPage,
+                      extra: widget.usuario,
+                    );
                   },
                   child: const Text("Agregar al carrito"),
                 ),
@@ -153,7 +161,6 @@ class _ProductScreenState extends State<ProductScreen> {
 
             const SizedBox(height: 20),
 
-            // Descripción
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -164,47 +171,47 @@ class _ProductScreenState extends State<ProductScreen> {
 
             const SizedBox(height: 10),
 
-            // Tallas y colores disponibles
             Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
                 spacing: 8,
-                children:
-                    widget.producto.tallas.map((talla) {
-                      return ChoiceChip(
-                        label: Text(talla),
-                        selected: tallaSeleccionada == talla,
-                        onSelected: (_) {
-                          setState(() {
-                            tallaSeleccionada = talla;
-                          });
-                        },
-                      );
-                    }).toList(),
+                children: widget.producto.tallas.map((talla) {
+                  return ChoiceChip(
+                    label: Text(talla),
+                    selected: tallaSeleccionada == talla,
+                    onSelected: (_) {
+                      setState(() {
+                        tallaSeleccionada = talla;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
+
             const SizedBox(height: 8),
+
             Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
                 spacing: 8,
-                children:
-                    widget.producto.colores.map((color) {
-                      return ChoiceChip(
-                        label: Text(color),
-                        selected: colorSeleccionado == color,
-                        onSelected: (_) {
-                          setState(() {
-                            colorSeleccionado = color;
-                          });
-                        },
-                      );
-                    }).toList(),
+                children: widget.producto.colores.map((color) {
+                  return ChoiceChip(
+                    label: Text(color),
+                    selected: colorSeleccionado == color,
+                    onSelected: (_) {
+                      setState(() {
+                        colorSeleccionado = color;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

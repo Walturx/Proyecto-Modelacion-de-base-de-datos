@@ -1,4 +1,5 @@
 class Producto {
+  final int idProducto;
   final String nombre;
   final String imagen;
   final double precio;
@@ -8,6 +9,7 @@ class Producto {
   final int stock;
 
   Producto({
+    required this.idProducto,
     required this.nombre,
     required this.imagen,
     required this.precio,
@@ -19,6 +21,7 @@ class Producto {
 
   factory Producto.fromMap(Map<String, dynamic> data) {
     return Producto(
+      idProducto: data['id'] ?? 0, // 👈 CAMBIADO
       nombre: data['nombre'] ?? '',
       imagen: data['imagen'] ?? '',
       precio: (data['precio'] is int)
@@ -35,6 +38,7 @@ class Producto {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': idProducto, // 👈 CAMBIADO
       'nombre': nombre,
       'imagen': imagen,
       'precio': precio,

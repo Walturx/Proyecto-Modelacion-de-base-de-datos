@@ -1,3 +1,4 @@
+import 'package:app_ropa/models/userModel.dart';
 import 'package:flutter/material.dart';
 import 'package:app_ropa/models/pedidoModel.dart';
 import 'package:go_router/go_router.dart';
@@ -5,11 +6,12 @@ import 'package:go_router/go_router.dart';
 class FacturaScreen extends StatelessWidget {
   final List<Pedido> pedidos;
   final double envio;
-
+    final Usuario usuario;
   const FacturaScreen({
     super.key,
     required this.pedidos,
     this.envio = 10.0,
+    required this.usuario
   });
 
   @override
@@ -84,7 +86,7 @@ class FacturaScreen extends StatelessWidget {
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                   context.go('/home');
+                context.go('/home', extra: usuario);
                 },
                 label: const Text("Volver al inicio"),
                 style: ElevatedButton.styleFrom(
