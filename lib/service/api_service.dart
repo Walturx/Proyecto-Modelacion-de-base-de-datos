@@ -3,7 +3,6 @@ import 'dart:convert';
 
 Future<void> insertarPedido() async {
   final url = Uri.parse('http://10.0.2.2:3000/insertar-pedido'); // 
-  // final url = Uri.parse('http://localhost:3000/insertar-pedido'); 
 
   final data = {
     "factura": {

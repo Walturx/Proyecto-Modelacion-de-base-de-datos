@@ -55,5 +55,10 @@ class UsuarioRepository {
     } else {
       print('✅ Usuario guardado en Oracle');
     }
+    
   }
+  Future<Usuario?> obtenerUsuarioPorEmail(String email) async {
+  return await _usuarioService.obtenerUsuarioPorEmail(email);
+}
+
 }

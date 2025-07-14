@@ -96,7 +96,7 @@ Future<void> agregarPedido(Pedido pedido, Usuario usuario) async {
   }
 
   Future<void> reducirStockEnOracle(int idProducto, int cantidadVendida) async {
-    final url = Uri.parse('http://192.168.1.100:3000/reducir-stock');
+    final url = Uri.parse('http://10.0.2.2:3000/reducir-stock');
 
     final body = {'id_producto': idProducto, 'cantidad': cantidadVendida};
 

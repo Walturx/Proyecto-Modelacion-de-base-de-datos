@@ -1,3 +1,4 @@
+import 'package:app_ropa/auth/authService.dart';
 import 'package:app_ropa/cubit/ropa_cubit.dart';
 import 'package:app_ropa/goRouter/router.dart';
 import 'package:app_ropa/models/ropaModel.dart';
@@ -18,7 +19,6 @@ class _HomescreenState extends State<Homescreen> {
    @override
   void initState() {
     super.initState();
-    // Llamamos al cubit para cargar los platos al iniciar la pantalla
     context.read<RopaCubit>().getRopa();
   }
   @override
@@ -31,12 +31,17 @@ class _HomescreenState extends State<Homescreen> {
           IconButton(
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
+              context.push(Routes.cartPage, extra: widget.usuario);
               
             },
           ),
-          IconButton(icon: Icon(Icons.person), onPressed: () {
-            
-          }),
+         IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await AuthService().logout();
+              context.go('/register'); // o context.go(Routes.register);
+            },
+         )
         ],
       ),
       body: SingleChildScrollView(
@@ -95,7 +100,7 @@ class _HomescreenState extends State<Homescreen> {
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.66,
+                        childAspectRatio: 0.77,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
@@ -149,7 +154,7 @@ class _HomescreenState extends State<Homescreen> {
                 ropa.imagen,
                 fit: BoxFit.fitHeight,
                 width: double.infinity,
-                height: 110,
+                height: 180,
               ),
             ),
             SizedBox(height: 10),

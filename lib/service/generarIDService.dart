@@ -1,4 +1,3 @@
-// utils/id_generator.dart
 import 'dart:math';
 
 String generarId({bool conPrefijo = false}) {

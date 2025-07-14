@@ -1,5 +1,7 @@
 import 'package:app_ropa/cubit/ropa_cubit.dart';
+import 'package:app_ropa/firebase_options.dart';
 import 'package:app_ropa/goRouter/router.dart';
+import 'package:app_ropa/providers/loginProvider.dart';
 import 'package:app_ropa/providers/productoProvider.dart';
 import 'package:app_ropa/views/homeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,12 +14,16 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+     options: DefaultFirebaseOptions.currentPlatform, 
+  );
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CarritoProvider()),
+        ChangeNotifierProvider(create: (_) => Loginprovider()),
+
         BlocProvider(create: (_) => RopaCubit()..getRopa()),
       ],
       child: const MyApp(),

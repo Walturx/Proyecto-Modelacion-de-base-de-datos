@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 
 class UsuarioService {
   final CollectionReference usuariosRef =
-      FirebaseFirestore.instance.collection('usuarios'); // ← corregido: colección en minúscula
+      FirebaseFirestore.instance.collection('usuarios'); 
 
-  // Crear o registrar un usuario
   Future<void> agregarUsuario(Usuario usuario) async {
     await usuariosRef.doc(usuario.id).set(usuario.toMap());
   }
@@ -50,4 +49,22 @@ class UsuarioService {
       print('Error al eliminar usuario: $e');
     }
   }
+  Future<Usuario?> obtenerUsuarioPorEmail(String email) async {
+  try {
+    final querySnapshot = await usuariosRef
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+      return Usuario.fromMap(data);
+    }
+  } catch (e) {
+    print('Error al buscar usuario por email: $e');
+  }
+  return null;
 }
+
+}
+

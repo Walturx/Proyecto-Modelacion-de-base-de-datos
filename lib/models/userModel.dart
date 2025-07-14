@@ -25,17 +25,17 @@ class Usuario {
       'tipo': tipo,
     };
   }
+factory Usuario.fromMap(Map<String, dynamic> map) {
+  return Usuario(
+    id: map['id']?.toString() ?? '',
+    nombre: map['nombre']?.toString() ?? '',
+    direccion: map['direccion']?.toString() ?? '',
+    email: map['email']?.toString() ?? '',
+    telefono: map['telefono']?.toString() ?? '',
+    tipo: map['tipo']?.toString() ?? '',
+  );
+}
 
-  factory Usuario.fromMap(Map<String, dynamic> map) {
-    return Usuario(
-      id: map['id'],
-      nombre: map['nombre'],
-      direccion: map['direccion'],
-      email: map['email'],
-      telefono: map['telefono'].toString(),
-      tipo: map['tipo'],
-    );
-  }
 
   @override
   String toString() {

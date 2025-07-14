@@ -21,7 +21,7 @@ class Producto {
 
   factory Producto.fromMap(Map<String, dynamic> data) {
     return Producto(
-      idProducto: data['id'] ?? 0, // 👈 CAMBIADO
+      idProducto: data['id'] ?? 0, 
       nombre: data['nombre'] ?? '',
       imagen: data['imagen'] ?? '',
       precio: (data['precio'] is int)
@@ -38,7 +38,7 @@ class Producto {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': idProducto, // 👈 CAMBIADO
+      'id': idProducto,
       'nombre': nombre,
       'imagen': imagen,
       'precio': precio,

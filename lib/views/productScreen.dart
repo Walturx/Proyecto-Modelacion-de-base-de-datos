@@ -37,7 +37,7 @@ Widget build(BuildContext context) {
       actions: [
         IconButton(
           icon: Icon(Icons.shopping_cart),
-          onPressed: () {}, // Ir al carrito
+          onPressed: () {}, 
         ),
       ],
     ),
@@ -79,8 +79,25 @@ Widget build(BuildContext context) {
               ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
+            Row(
+              children: [
+                Text( "Stock: ${widget.producto.stock}",
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(width: 260),
+                Text(widget.producto.stock > 0
+                    ? "Disponible"
+                    : "No disponible",
+                  style: TextStyle(
+                    color: widget.producto.stock > 0 ? Colors.green : Colors.red,
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Container(
